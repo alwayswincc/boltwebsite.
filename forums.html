@@ -248,12 +248,11 @@
         const uid = urlParams.get('uid') || 'UID-UNKNOWN';
         const username = urlParams.get('username') || 'Anonymous';
 
-        const hardcodedUsers = {
-            'Bolt!': { uid: 'UID-0001', created: '2025-03-29T12:00:00Z', lastOnline: new Date().toISOString() },
-            'listn': { uid: 'UID-0002', created: '2025-03-29T12:05:00Z', lastOnline: new Date().toISOString() }
+        const users = JSON.parse(localStorage.getItem('boltUsers')) || {
+            'Bolt!': { uid: 'UID-0001', password: 'bolt!', created: '2025-03-29T12:00:00Z', lastOnline: '2025-03-29T12:00:00Z' },
+            'listn': { uid: 'UID-0002', password: 'listnupdates', created: '2025-03-29T12:05:00Z', lastOnline: '2025-03-29T12:05:00Z' }
         };
-
-        const userData = hardcodedUsers[username] || { created: 'Unknown', lastOnline: 'Unknown' };
+        const userData = users[username] || { created: 'Unknown', lastOnline: 'Unknown' };
         document.getElementById('user-info').innerHTML = `
             Logged in as: ${username} (${uid})<br>
             Joined: ${new Date(userData.created).toLocaleString()}<br>
@@ -351,7 +350,6 @@
                         created: thread.created
                     });
                 }
- isOwnElement = true;
                 thread.comments.forEach(comment => {
                     if (comment.uid === uid) {
                         userPosts.push({
