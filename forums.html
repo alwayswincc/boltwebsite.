@@ -1,365 +1,135 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Bolt! - Forums</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #1C2526; /* Midnight-ish */
-            color: #7289DA; /* Blurple text */
-            font-family: Arial, sans-serif;
-        }
-        h1 {
-            font-size: 72px;
-            font-weight: bold;
-            margin-top: 20px;
-            text-shadow: 
-                0 0 10px #FF0000, /* Red glow */
-                0 0 20px #800080; /* Purple glow */
-        }
-        .nav-tabs {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-        }
-        .nav-tab {
-            padding: 8px 15px;
-            background-color: #2A3439;
-            color: #7289DA;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        .nav-tab:hover {
-            background-color: #FF0000;
-            color: #fff;
-        }
-        .profile-container {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            display: flex;
-            align-items: center;
-            background-color: #2A3439;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
-        }
-        .profile-pfp {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            margin-right: 10px;
-            border: 2px solid #7289DA;
-        }
-        .profile-info {
-            color: #fff;
-            font-size: 14px;
-        }
-        .forums-container {
-            margin-top: 50px;
-            background-color: #2A3439; /* Darker panel */
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5); /* Red-tinted shadow */
-            width: 700px;
-        }
-        .user-info {
-            font-size: 18px;
-            color: #fff;
-            margin-bottom: 20px;
-        }
-        .user-info a {
-            color: #7289DA;
-            text-decoration: none;
-        }
-        .user-info a:hover {
-            color: #FF0000;
-        }
-        .chat-section {
-            background-color: #1C2526;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .chat-section h2 {
-            color: #7289DA;
-            font-size: 20px;
-            margin: 0 0 10px 0;
-        }
-        .chat-message {
-            background-color: #2A3439;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-        }
-        .chat-message p {
-            margin: 0;
-            color: #fff;
-            font-size: 14px;
-        }
-        .chat-message .meta {
-            font-size: 12px;
-            color: #7289DA;
-            margin-top: 5px;
-        }
-        .chat-form {
-            margin-top: 10px;
-        }
-        .chat-form input {
-            width: 100%;
-            padding: 8px;
-            background-color: #1C2526;
-            border: 1px solid #7289DA;
-            color: #fff;
-            border-radius: 5px;
-            font-size: 14px;
-            box-sizing: border-box;
-        }
-        .chat-form button {
-            width: 100%;
-            padding: 8px;
-            background-color: #7289DA;
-            border: none;
-            color: #fff;
-            font-size: 14px;
-            font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 5px;
-        }
-        .chat-form button:hover {
-            background-color: #FF0000;
-        }
-        .announcements {
-            background-color: #1C2526;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-        }
-        .announcements h2 {
-            color: #7289DA;
-            font-size: 24px;
-            margin: 0 0 15px 0;
-        }
-        .announcement {
-            background-color: #2A3439;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-        }
-        .announcement p {
-            margin: 0;
-            color: #fff;
-            font-size: 14px;
-        }
-        .announcement .meta {
-            font-size: 12px;
-            color: #7289DA;
-            margin-top: 5px;
-        }
-        .announcement-form {
-            margin-bottom: 20px;
-        }
-        .announcement-form textarea {
-            width: 100%;
-            height: 60px;
-            background-color: #1C2526;
-            border: 1px solid #7289DA;
-            color: #fff;
-            border-radius: 5px;
-            padding: 10px;
-            font-size: 14px;
-            box-sizing: border-box;
-        }
-        .announcement-form button {
-            width: 100%;
-            padding: 8px;
-            background-color: #7289DA;
-            border: none;
-            color: #fff;
-            font-size: 14px;
-            font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 5px;
-        }
-        .announcement-form button:hover {
-            background-color: #FF0000;
-        }
-    </style>
-</head>
-<body>
-    <div class="nav-tabs">
-        <a href="#" class="nav-tab" id="bio-tab">Bio</a>
-    </div>
-    <div class="profile-container">
-        <img src="" class="profile-pfp" id="profile-pfp" alt="Profile Picture">
-        <div class="profile-info" id="display-name"></div>
-    </div>
-    <h1>Bolt!</h1>
-    <div class="forums-container">
-        <div class="user-info" id="user-info"></div>
-        <div class="chat-section">
-            <h2>Your Chats</h2>
-            <div id="your-chat-messages"></div>
-        </div>
-        <div class="chat-section">
-            <h2>Global Chats</h2>
-            <div id="global-chat-messages"></div>
-            <div class="chat-form">
-                <input type="text" id="chat-input" placeholder="Say some shit...">
-                <button onclick="sendChat()">Send</button>
-            </div>
-        </div>
-        <div class="announcements">
-            <h2>Announcements</h2>
-            <div id="announcement-entries"></div>
-            <div class="announcement-form">
-                <textarea id="announcement-content" placeholder="Drop a fucking announcement..."></textarea>
-                <button onclick="addAnnouncement()">Post Announcement</button>
-            </div>
-        </div>
-    </div>
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const uid = urlParams.get('uid') || 'UID-UNKNOWN';
+    const username = urlParams.get('username') || 'Anonymous';
 
-    <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const uid = urlParams.get('uid') || 'UID-UNKNOWN';
-        const username = urlParams.get('username') || 'Anonymous';
+    const users = JSON.parse(localStorage.getItem('boltUsers')) || {
+        'Bolt!': { uid: 'UID-0001', password: 'bolt!', created: '2025-03-29T12:00:00Z', lastOnline: '2025-03-29T12:00:00Z', pfp: '', displayName: 'BoltMaster' },
+        'listn': { uid: 'UID-0002', password: 'listnupdates', created: '2025-03-29T12:05:00Z', lastOnline: '2025-03-29T12:05:00Z', pfp: '', displayName: 'ListnUp' }
+    };
+    const userData = users[username] || { created: 'Unknown', lastOnline: 'Unknown', pfp: '', displayName: username };
 
-        const users = JSON.parse(localStorage.getItem('boltUsers')) || {
-            'Bolt!': { uid: 'UID-0001', password: 'bolt!', created: '2025-03-29T12:00:00Z', lastOnline: '2025-03-29T12:00:00Z', pfp: '', displayName: 'BoltMaster' },
-            'listn': { uid: 'UID-0002', password: 'listnupdates', created: '2025-03-29T12:05:00Z', lastOnline: '2025-03-29T12:05:00Z', pfp: '', displayName: 'ListnUp' }
-        };
-        const userData = users[username] || { created: 'Unknown', lastOnline: 'Unknown', pfp: '', displayName: username };
-        
-        document.getElementById('user-info').innerHTML = `
-            Logged in as: ${username} (${uid}) [<a href="bio.html?uid=${uid}&username=${encodeURIComponent(username)}">Bio</a>]<br>
-            Joined: ${new Date(userData.created).toLocaleString()}<br>
-            Last Online: ${new Date(userData.lastOnline).toLocaleString()}
-        `;
-        
-        document.getElementById('bio-tab').href = `bio.html?uid=${uid}&username=${encodeURIComponent(username)}`;
+    document.getElementById('user-info').innerHTML = `
+        Logged in as: ${username} (${uid}) [<a href="bio.html?uid=${uid}&username=${encodeURIComponent(username)}">Bio</a>]<br>
+        Joined: ${new Date(userData.created).toLocaleString()}<br>
+        Last Online: ${new Date(userData.lastOnline).toLocaleString()}
+    `;
+    document.getElementById('bio-tab').href = `bio.html?uid=${uid}&username=${encodeURIComponent(username)}`;
 
-        // Profile display
-        const defaultPFP = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADJSURBVFhH7Za9DYBACES7/QX3bsEH2NjY2NjY2NjY2NgYxsbGxsYQEf+EBUFEtVrVqlUAgL6+PhqN5vP5TqdTqVSCIAjW6/XpdDqVSqVSCYIgWKlUis/n8/l8Pp1OpVIJgiBYqVSKzWaz2Ww2m82mUqkEgSBYqVSK3W63W+12u91ut9vtVCoBIJDP5/P5fD6fTqfT6XQ6nUqlEgSCYL1eD4IgWKlUIAgC2Ww2m82mUqlUgiAI1uv1er1er9fr9Xq9Xq/X6/U6nUqlUgmCIAjW6/V6vV6v1+t1Op1KpRIEmwE2nH4aK4fSAAAAAElFTkSuQmCC';
-        document.getElementById('profile-pfp').src = userData.pfp || defaultPFP;
-        document.getElementById('display-name').textContent = userData.displayName || username;
+    const defaultPFP = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADJSURBVFhH7Za9DYBACES7/QX3bsEH2NjY2NjY2NjY2NgYxsbGxsYQEf+EBUFEtVrVqlUAgL6+PhqN5vP5TqdTqVSCIAjW6/XpdDqVSqVSCYIgWKlUis/n8/l8Pp1OpVIJgiBYqVSKzWaz2Ww2m82mUqkEgSBYqVSK3W63W+12u91ut9vtVCoBIJDP5/P5fD6fTqfT6XQ6nUqlEgSCYL1eD4IgWKlUIAgC2Ww2m82mUqlUgiAI1uv1er1er9fr9Xq9Xq/X6/U6nUqlUgmCIAjW6/V6vV6v1+t1Op1KpRIEmwE2nH4aK4fSAAAAAElFTkSuQmCC';
+    document.getElementById('profile-pfp').src = userData.pfp || defaultPFP;
+    document.getElementById('display-name').textContent = userData.displayName || username;
 
-        let chatMessages = JSON.parse(localStorage.getItem('boltChat')) || [
-            { id: 1, content: "Yo, global chat’s live!", uid: "UID-0001", username: "Bolt!", displayName: "BoltMaster", created: "2025-03-29T12:00:00Z" },
-            { id: 2, content: "Fuck yeah it is!", uid: "UID-0002", username: "listn", displayName: "ListnUp", created: "2025-03-29T12:05:00Z" }
-        ];
+    let chatMessages = [];
+    const ws = new WebSocket(`ws://localhost:8080?uid=${uid}&username=${username}`);
 
-        let announcements = JSON.parse(localStorage.getItem('boltAnnouncements')) || [
-            { id: 1, content: "Welcome to the Bolt! Forum, fuckers!", uid: "UID-0001", username: "Bolt!", created: "2025-03-29T12:00:00Z" }
-        ];
+    ws.onopen = () => {
+        console.log('Connected to server');
+    };
 
-        function renderYourChats() {
-            const yourChatDiv = document.getElementById('your-chat-messages');
-            yourChatDiv.innerHTML = '';
-            const yourMessages = chatMessages.filter(msg => msg.uid === uid);
-            yourMessages.forEach(msg => {
-                const msgDiv = document.createElement('div');
-                msgDiv.className = 'chat-message';
-                msgDiv.innerHTML = `
-                    <p>${msg.content}</p>
-                    <div class="meta">Sent by ${msg.displayName || msg.username} (${msg.uid}) on ${new Date(msg.created).toLocaleString()}</div>
-                `;
-                yourChatDiv.appendChild(msgDiv);
-            });
-            if (!yourMessages.length) {
-                yourChatDiv.innerHTML = '<p>No fucking chats yet, asshole.</p>';
-            }
-            yourChatDiv.scrollTop = yourChatDiv.scrollHeight; // Auto-scroll to bottom
+    ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === 'init') {
+            chatMessages = data.messages;
+            renderYourChats();
+            renderGlobalChats();
+        } else if (data.type === 'message') {
+            chatMessages.push(data.message);
+            renderYourChats();
+            renderGlobalChats();
         }
+    };
 
-        function renderGlobalChats() {
-            const globalChatDiv = document.getElementById('global-chat-messages');
-            globalChatDiv.innerHTML = '';
-            const otherMessages = chatMessages.filter(msg => msg.uid !== uid);
-            otherMessages.forEach(msg => {
-                const msgDiv = document.createElement('div');
-                msgDiv.className = 'chat-message';
-                msgDiv.innerHTML = `
-                    <p>${msg.content}</p>
-                    <div class="meta">Sent by ${msg.displayName || msg.username} (${msg.uid}) on ${new Date(msg.created).toLocaleString()}</div>
-                `;
-                globalChatDiv.appendChild(msgDiv);
-            });
-            if (!otherMessages.length) {
-                globalChatDiv.innerHTML = '<p>No global chats yet.</p>';
-            }
-            globalChatDiv.scrollTop = globalChatDiv.scrollHeight; // Auto-scroll to bottom
-        }
-
-        function sendChat() {
-            const content = document.getElementById('chat-input').value.trim();
-            if (content) {
-                const newId = chatMessages.length ? Math.max(...chatMessages.map(m => m.id)) + 1 : 1;
-                chatMessages.push({
-                    id: newId,
-                    content,
-                    uid,
-                    username,
-                    displayName: userData.displayName,
-                    created: new Date().toISOString()
-                });
-                document.getElementById('chat-input').value = '';
-                localStorage.setItem('boltChat', JSON.stringify(chatMessages));
-                renderYourChats();
-                renderGlobalChats();
-            }
-        }
-
-        function renderAnnouncements() {
-            const announceDiv = document.getElementById('announcement-entries');
-            announceDiv.innerHTML = '';
-            announcements.forEach(announce => {
-                const entryDiv = document.createElement('div');
-                entryDiv.className = 'announcement';
-                entryDiv.innerHTML = `
-                    <p>${announce.content}</p>
-                    <div class="meta">Posted by ${users[announce.username]?.displayName || announce.username} (${announce.uid}) on ${new Date(announce.created).toLocaleString()}</div>
-                `;
-                announceDiv.appendChild(entryDiv);
-            });
-        }
-
-        function addAnnouncement() {
-            const content = document.getElementById('announcement-content').value.trim();
-            if (content) {
-                const newId = announcements.length ? Math.max(...announcements.map(a => a.id)) + 1 : 1;
-                announcements.push({
-                    id: newId,
-                    content,
-                    uid,
-                    username,
-                    created: new Date().toISOString()
-                });
-                document.getElementById('announcement-content').value = '';
-                localStorage.setItem('boltAnnouncements', JSON.stringify(announcements));
-                renderAnnouncements();
-            }
-        }
-
-        renderYourChats();
-        renderGlobalChats();
-        renderAnnouncements();
-
-        // Allow Enter key to send chat
-        document.getElementById('chat-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendChat();
-            }
+    function renderYourChats() {
+        const yourChatDiv = document.getElementById('your-chat-messages');
+        yourChatDiv.innerHTML = '';
+        const yourMessages = chatMessages.filter(msg => msg.uid === uid);
+        yourMessages.forEach(msg => {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'chat-message';
+            msgDiv.innerHTML = `
+                <p>${msg.content}</p>
+                <div class="meta">Sent by ${msg.displayName || msg.username} (${msg.uid}) on ${new Date(msg.created).toLocaleString()}</div>
+            `;
+            yourChatDiv.appendChild(msgDiv);
         });
-    </script>
-</body>
-</html>
+        if (!yourMessages.length) {
+            yourChatDiv.innerHTML = '<p>No fucking chats yet, asshole.</p>';
+        }
+        yourChatDiv.scrollTop = yourChatDiv.scrollHeight;
+    }
+
+    function renderGlobalChats() {
+        const globalChatDiv = document.getElementById('global-chat-messages');
+        globalChatDiv.innerHTML = '';
+        const otherMessages = chatMessages.filter(msg => msg.uid !== uid);
+        otherMessages.forEach(msg => {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'chat-message';
+            msgDiv.innerHTML = `
+                <p>${msg.content}</p>
+                <div class="meta">Sent by ${msg.displayName || msg.username} (${msg.uid}) on ${new Date(msg.created).toLocaleString()}</div>
+            `;
+            globalChatDiv.appendChild(msgDiv);
+        });
+        if (!otherMessages.length) {
+            globalChatDiv.innerHTML = '<p>No global chats yet.</p>';
+        }
+        globalChatDiv.scrollTop = globalChatDiv.scrollHeight;
+    }
+
+    function sendChat() {
+        const content = document.getElementById('chat-input').value.trim();
+        if (content) {
+            ws.send(JSON.stringify({
+                type: 'chat',
+                content,
+                displayName: userData.displayName
+            }));
+            document.getElementById('chat-input').value = '';
+        }
+    }
+
+    let announcements = JSON.parse(localStorage.getItem('boltAnnouncements')) || [
+        { id: 1, content: "Welcome to the Bolt! Forum, fuckers!", uid: "UID-0001", username: "Bolt!", created: "2025-03-29T12:00:00Z" }
+    ];
+
+    function renderAnnouncements() {
+        const announceDiv = document.getElementById('announcement-entries');
+        announceDiv.innerHTML = '';
+        announcements.forEach(announce => {
+            const entryDiv = document.createElement('div');
+            entryDiv.className = 'announcement';
+            entryDiv.innerHTML = `
+                <p>${announce.content}</p>
+                <div class="meta">Posted by ${users[announce.username]?.displayName || announce.username} (${announce.uid}) on ${new Date(announce.created).toLocaleString()}</div>
+            `;
+            announceDiv.appendChild(entryDiv);
+        });
+    }
+
+    function addAnnouncement() {
+        const content = document.getElementById('announcement-content').value.trim();
+        if (content) {
+            const newId = announcements.length ? Math.max(...announcements.map(a => a.id)) + 1 : 1;
+            announcements.push({
+                id: newId,
+                content,
+                uid,
+                username,
+                created: new Date().toISOString()
+            });
+            document.getElementById('announcement-content').value = '';
+            localStorage.setItem('boltAnnouncements', JSON.stringify(announcements));
+            renderAnnouncements();
+        }
+    }
+
+    renderAnnouncements();
+
+    document.getElementById('chat-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendChat();
+        }
+    });
+</script>
