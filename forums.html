@@ -39,6 +39,53 @@
             background-color: #FF0000;
             color: #fff;
         }
+        .profile-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            background-color: #2A3439;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+        .profile-pfp {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 10px;
+            cursor: pointer;
+            border: 2px solid #7289DA;
+        }
+        .profile-pfp:hover {
+            border-color: #FF0000;
+        }
+        .profile-info {
+            color: #fff;
+            font-size: 14px;
+        }
+        .profile-info input {
+            background-color: #1C2526;
+            border: 1px solid #7289DA;
+            color: #fff;
+            border-radius: 3px;
+            padding: 2px 5px;
+            font-size: 14px;
+            width: 120px;
+        }
+        .profile-info button {
+            background-color: #7289DA;
+            border: none;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        .profile-info button:hover {
+            background-color: #FF0000;
+        }
         .forums-container {
             margin-top: 50px;
             background-color: #2A3439; /* Darker panel */
@@ -245,6 +292,15 @@
     <div class="nav-tabs">
         <a href="#" class="nav-tab" id="bio-tab">Bio</a>
     </div>
+    <div class="profile-container">
+        <img src="" class="profile-pfp" id="profile-pfp" onclick="document.getElementById('pfp-upload').click()" alt="Profile Picture">
+        <input type="file" id="pfp-upload" accept="image/*" style="display: none;" onchange="updatePFP(event)">
+        <div class="profile-info">
+            <div id="display-name"></div>
+            <input type="text" id="display-name-input" placeholder="Set display name">
+            <button onclick="saveDisplayName()">Save</button>
+        </div>
+    </div>
     <h1>Bolt!</h1>
     <div class="forums-container">
         <div class="user-info" id="user-info"></div>
@@ -276,18 +332,47 @@
         const username = urlParams.get('username') || 'Anonymous';
 
         const users = JSON.parse(localStorage.getItem('boltUsers')) || {
-            'Bolt!': { uid: 'UID-0001', password: 'bolt!', created: '2025-03-29T12:00:00Z', lastOnline: '2025-03-29T12:00:00Z' },
-            'listn': { uid: 'UID-0002', password: 'listnupdates', created: '2025-03-29T12:05:00Z', lastOnline: '2025-03-29T12:05:00Z' }
+            'Bolt!': { uid: 'UID-0001', password: 'bolt!', created: '2025-03-29T12:00:00Z', lastOnline: '2025-03-29T12:00:00Z', pfp: '', displayName: 'BoltMaster' },
+            'listn': { uid: 'UID-0002', password: 'listnupdates', created: '2025-03-29T12:05:00Z', lastOnline: '2025-03-29T12:05:00Z', pfp: '', displayName: 'ListnUp' }
         };
-        const userData = users[username] || { created: 'Unknown', lastOnline: 'Unknown' };
+        const userData = users[username] || { created: 'Unknown', lastOnline: 'Unknown', pfp: '', displayName: username };
+        
         document.getElementById('user-info').innerHTML = `
             Logged in as: ${username} (${uid}) [<a href="bio.html?uid=${uid}&username=${encodeURIComponent(username)}">Bio</a>]<br>
             Joined: ${new Date(userData.created).toLocaleString()}<br>
             Last Online: ${new Date(userData.lastOnline).toLocaleString()}
         `;
-
-        // Set Bio tab href dynamically
+        
         document.getElementById('bio-tab').href = `bio.html?uid=${uid}&username=${encodeURIComponent(username)}`;
+
+        // Profile setup
+        const defaultPFP = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADJSURBVFhH7Za9DYBACES7/QX3bsEH2NjY2NjY2NjY2NgYxsbGxsYQEf+EBUFEtVrVqlUAgL6+PhqN5vP5TqdTqVSCIAjW6/XpdDqVSqVSCYIgWKlUis/n8/l8Pp1OpVIJgiBYqVSKzWaz2Ww2m82mUqkEgSBYqVSK3W63W+12u91ut9vtVCoBIJDP5/P5fD6fTqfT6XQ6nUqlEgSCYL1eD4IgWKlUIAgC2Ww2m82mUqlUgiAI1uv1er1er9fr9Xq9Xq/X6/U6nUqlUgmCIAjW6/V6vV6v1+t1Op1KpRIEmwE2nH4aK4fSAAAAAElFTkSuQmCC';
+        document.getElementById('profile-pfp').src = userData.pfp || defaultPFP;
+        document.getElementById('display-name').textContent = userData.displayName || username;
+        document.getElementById('display-name-input').value = userData.displayName || '';
+
+        function updatePFP(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const pfpData = e.target.result;
+                    users[username].pfp = pfpData;
+                    localStorage.setItem('boltUsers', JSON.stringify(users));
+                    document.getElementById('profile-pfp').src = pfpData;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function saveDisplayName() {
+            const displayName = document.getElementById('display-name-input').value.trim();
+            if (displayName) {
+                users[username].displayName = displayName;
+                localStorage.setItem('boltUsers', JSON.stringify(users));
+                document.getElementById('display-name').textContent = displayName;
+            }
+        }
 
         let threads = JSON.parse(localStorage.getItem('boltThreads')) || [
             {
@@ -332,7 +417,7 @@
                 entryDiv.className = 'announcement';
                 entryDiv.innerHTML = `
                     <p>${announce.content}</p>
-                    <div class="meta">Posted by ${announce.username} (${announce.uid}) on ${new Date(announce.created).toLocaleString()}</div>
+                    <div class="meta">Posted by ${users[announce.username]?.displayName || announce.username} (${announce.uid}) on ${new Date(announce.created).toLocaleString()}</div>
                 `;
                 announceDiv.appendChild(entryDiv);
             });
@@ -347,12 +432,12 @@
                 threadDiv.innerHTML = `
                     <h3>${thread.title}</h3>
                     <p class="op">${thread.content}</p>
-                    <div class="meta">Posted by ${thread.username} (${thread.uid}) on ${new Date(thread.created).toLocaleString()}</div>
+                    <div class="meta">Posted by ${users[thread.username]?.displayName || thread.username} (${thread.uid}) on ${new Date(thread.created).toLocaleString()}</div>
                     <div class="comments">
                         ${thread.comments.map(comment => `
                             <div class="comment">
                                 <p>${comment.content}</p>
-                                <div class="meta">Replied by ${comment.username} (${comment.uid}) on ${new Date(comment.created).toLocaleString()}</div>
+                                <div class="meta">Replied by ${users[comment.username]?.displayName || comment.username} (${comment.uid}) on ${new Date(comment.created).toLocaleString()}</div>
                             </div>
                         `).join('')}
                     </div>
