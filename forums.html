@@ -35,6 +35,13 @@
             color: #fff;
             margin-bottom: 20px;
         }
+        .user-info a {
+            color: #7289DA;
+            text-decoration: none;
+        }
+        .user-info a:hover {
+            color: #FF0000;
+        }
         .announcements {
             background-color: #1C2526;
             padding: 15px;
@@ -254,7 +261,7 @@
         };
         const userData = users[username] || { created: 'Unknown', lastOnline: 'Unknown' };
         document.getElementById('user-info').innerHTML = `
-            Logged in as: ${username} (${uid})<br>
+            Logged in as: ${username} (${uid}) [<a href="bio.html?uid=${uid}&username=${encodeURIComponent(username)}">Bio</a>]<br>
             Joined: ${new Date(userData.created).toLocaleString()}<br>
             Last Online: ${new Date(userData.lastOnline).toLocaleString()}
         `;
@@ -430,6 +437,120 @@
 
         renderAnnouncements();
         renderThreads();
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bolt! - Bio</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #1C2526; /* Midnight-ish */
+            color: #7289DA; /* Blurple text */
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            font-size: 72px;
+            font-weight: bold;
+            margin-top: 20px;
+            text-shadow: 
+                0 0 10px #FF0000, /* Red glow */
+                0 0 20px #800080; /* Purple glow */
+        }
+        .bio-container {
+            margin-top: 50px;
+            background-color: #2A3439; /* Darker panel */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5); /* Red-tinted shadow */
+            width: 500px;
+        }
+        .bio-info {
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        .bio-info a {
+            color: #7289DA;
+            text-decoration: none;
+        }
+        .bio-info a:hover {
+            color: #FF0000;
+        }
+        .bio-form textarea {
+            width: 100%;
+            height: 150px;
+            background-color: #1C2526;
+            border: 1px solid #7289DA;
+            color: #fff;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .bio-form button {
+            width: 100%;
+            padding: 10px;
+            background-color: #7289DA;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .bio-form button:hover {
+            background-color: #FF0000;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bolt!</h1>
+    <div class="bio-container">
+        <div class="bio-info" id="bio-info"></div>
+        <div class="bio-form">
+            <textarea id="bio-content" placeholder="Write your fucking bio..."></textarea>
+            <button onclick="saveBio()">Save Bio</button>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const uid = urlParams.get('uid') || 'UID-UNKNOWN';
+        const username = urlParams.get('username') || 'Anonymous';
+
+        const users = JSON.parse(localStorage.getItem('boltUsers')) || {
+            'Bolt!': { uid: 'UID-0001', password: 'bolt!', created: '2025-03-29T12:00:00Z', lastOnline: '2025-03-29T12:00:00Z', bio: 'King of this shitshow.' },
+            'listn': { uid: 'UID-0002', password: 'listnupdates', created: '2025-03-29T12:05:00Z', lastOnline: '2025-03-29T12:05:00Z', bio: 'Just here to fuck around.' }
+        };
+        const userData = users[username] || { created: 'Unknown', lastOnline: 'Unknown', bio: '' };
+
+        function renderBio() {
+            document.getElementById('bio-info').innerHTML = `
+                Username: ${username} (${uid}) [<a href="forums.html?uid=${uid}&username=${encodeURIComponent(username)}">Back to Forum</a>]<br>
+                Joined: ${new Date(userData.created).toLocaleString()}<br>
+                Last Online: ${new Date(userData.lastOnline).toLocaleString()}<br>
+                Bio: ${userData.bio || 'No fucking bio yet.'}
+            `;
+            document.getElementById('bio-content').value = userData.bio || '';
+        }
+
+        function saveBio() {
+            const bio = document.getElementById('bio-content').value.trim();
+            users[username].bio = bio;
+            localStorage.setItem('boltUsers', JSON.stringify(users));
+            renderBio();
+        }
+
+        renderBio();
     </script>
 </body>
 </html>
