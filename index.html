@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bolt!</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #1C2526; /* Midnight-ish */
+            color: #7289DA; /* Blurple text */
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            font-size: 72px;
+            font-weight: bold;
+            margin-top: 20px;
+            text-shadow: 
+                0 0 10px #FF0000, /* Red glow */
+                0 0 20px #800080; /* Purple glow */
+        }
+        .auth-container {
+            margin-top: 50px;
+            background-color: #2A3439; /* Darker panel */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5); /* Red-tinted shadow */
+            width: 300px;
+        }
+        .form {
+            text-align: center;
+        }
+        .auth-container select, .auth-container input {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #1C2526;
+            border: 1px solid #7289DA;
+            color: #fff;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .auth-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #7289DA; /* Blurple button */
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .auth-container button:hover {
+            background-color: #FF0000; /* Red on hover */
+        }
+    </style>
+</head>
+<body>
+    <h1>Bolt!</h1>
+    <div class="auth-container">
+        <div class="form">
+            <select id="username">
+                <option value="Bolt!">Bolt! (UID-0001)</option>
+                <option value="listn">listn (UID-0002)</option>
+            </select>
+            <input type="password" id="password" placeholder="Password" />
+            <button onclick="login()">Login</button>
+        </div>
+    </div>
+
+    <script>
+        const users = {
+            'Bolt!': { uid: 'UID-0001', password: 'bolt!' },
+            'listn': { uid: 'UID-0002', password: 'listnupdates' }
+        };
+
+        // Load last logged-in account
+        const lastUsername = localStorage.getItem('lastUsername') || 'Bolt!';
+        document.getElementById('username').value = lastUsername;
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const user = users[username];
+
+            if (password === user.password) {
+                localStorage.setItem('lastUsername', username); // Remember this account
+                window.location.href = `forums.html?uid=${user.uid}&username=${encodeURIComponent(username)}`;
+            } else {
+                alert('Wrong fucking password, dipshit. Try again.');
+            }
+        }
+    </script>
+</body>
+</html>
