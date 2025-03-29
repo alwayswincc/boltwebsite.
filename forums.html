@@ -86,13 +86,13 @@
             padding: 15px;
             margin-bottom: 20px;
             border-radius: 5px;
-            max-height: 300px;
+            max-height: 200px;
             overflow-y: auto;
         }
         .chat-section h2 {
             color: #7289DA;
-            font-size: 24px;
-            margin: 0 0 15px 0;
+            font-size: 20px;
+            margin: 0 0 10px 0;
         }
         .chat-message {
             background-color: #2A3439;
@@ -208,8 +208,12 @@
     <div class="forums-container">
         <div class="user-info" id="user-info"></div>
         <div class="chat-section">
-            <h2>Global Chat</h2>
-            <div id="chat-messages"></div>
+            <h2>Your Chats</h2>
+            <div id="your-chat-messages"></div>
+        </div>
+        <div class="chat-section">
+            <h2>Global Chats</h2>
+            <div id="global-chat-messages"></div>
             <div class="chat-form">
                 <input type="text" id="chat-input" placeholder="Say some shit...">
                 <button onclick="sendChat()">Send</button>
@@ -250,32 +254,50 @@
         document.getElementById('display-name').textContent = userData.displayName || username;
 
         let chatMessages = JSON.parse(localStorage.getItem('boltChat')) || [
-            { id: 1, content: "Yo, global chat’s live!", uid: "UID-0001", username: "Bolt!", displayName: "BoltMaster", created: "2025-03-29T12:00:00Z" }
+            { id: 1, content: "Yo, global chat’s live!", uid: "UID-0001", username: "Bolt!", displayName: "BoltMaster", created: "2025-03-29T12:00:00Z" },
+            { id: 2, content: "Fuck yeah it is!", uid: "UID-0002", username: "listn", displayName: "ListnUp", created: "2025-03-29T12:05:00Z" }
         ];
 
         let announcements = JSON.parse(localStorage.getItem('boltAnnouncements')) || [
-            {
-                id: 1,
-                content: "Welcome to the Bolt! Forum, fuckers!",
-                uid: "UID-0001",
-                username: "Bolt!",
-                created: "2025-03-29T12:00:00Z"
-            }
+            { id: 1, content: "Welcome to the Bolt! Forum, fuckers!", uid: "UID-0001", username: "Bolt!", created: "2025-03-29T12:00:00Z" }
         ];
 
-        function renderChat() {
-            const chatDiv = document.getElementById('chat-messages');
-            chatDiv.innerHTML = '';
-            chatMessages.forEach(msg => {
+        function renderYourChats() {
+            const yourChatDiv = document.getElementById('your-chat-messages');
+            yourChatDiv.innerHTML = '';
+            const yourMessages = chatMessages.filter(msg => msg.uid === uid);
+            yourMessages.forEach(msg => {
                 const msgDiv = document.createElement('div');
                 msgDiv.className = 'chat-message';
                 msgDiv.innerHTML = `
                     <p>${msg.content}</p>
                     <div class="meta">Sent by ${msg.displayName || msg.username} (${msg.uid}) on ${new Date(msg.created).toLocaleString()}</div>
                 `;
-                chatDiv.appendChild(msgDiv);
+                yourChatDiv.appendChild(msgDiv);
             });
-            chatDiv.scrollTop = chatDiv.scrollHeight; // Auto-scroll to bottom
+            if (!yourMessages.length) {
+                yourChatDiv.innerHTML = '<p>No fucking chats yet, asshole.</p>';
+            }
+            yourChatDiv.scrollTop = yourChatDiv.scrollHeight; // Auto-scroll to bottom
+        }
+
+        function renderGlobalChats() {
+            const globalChatDiv = document.getElementById('global-chat-messages');
+            globalChatDiv.innerHTML = '';
+            const otherMessages = chatMessages.filter(msg => msg.uid !== uid);
+            otherMessages.forEach(msg => {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'chat-message';
+                msgDiv.innerHTML = `
+                    <p>${msg.content}</p>
+                    <div class="meta">Sent by ${msg.displayName || msg.username} (${msg.uid}) on ${new Date(msg.created).toLocaleString()}</div>
+                `;
+                globalChatDiv.appendChild(msgDiv);
+            });
+            if (!otherMessages.length) {
+                globalChatDiv.innerHTML = '<p>No global chats yet.</p>';
+            }
+            globalChatDiv.scrollTop = globalChatDiv.scrollHeight; // Auto-scroll to bottom
         }
 
         function sendChat() {
@@ -292,7 +314,8 @@
                 });
                 document.getElementById('chat-input').value = '';
                 localStorage.setItem('boltChat', JSON.stringify(chatMessages));
-                renderChat();
+                renderYourChats();
+                renderGlobalChats();
             }
         }
 
@@ -327,7 +350,8 @@
             }
         }
 
-        renderChat();
+        renderYourChats();
+        renderGlobalChats();
         renderAnnouncements();
 
         // Allow Enter key to send chat
