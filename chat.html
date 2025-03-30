@@ -10,8 +10,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: #1C2526; /* Midnight-ish */
-            color: #7289DA; /* Blurple text */
+            background-color: #1C2526;
+            color: #7289DA;
             font-family: Arial, sans-serif;
         }
         h1 {
@@ -19,15 +19,15 @@
             font-weight: bold;
             margin-top: 20px;
             text-shadow: 
-                0 0 10px #FF0000, /* Red glow */
-                0 0 20px #800080; /* Purple glow */
+                0 0 10px #FF0000,
+                0 0 20px #800080;
         }
         .chat-container {
             margin-top: 50px;
-            background-color: #2A3439; /* Darker panel */
+            background-color: #2A3439;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5); /* Red-tinted shadow */
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
             width: 700px;
         }
         .user-info {
@@ -126,4 +126,58 @@
             'listn': { uid: 'UID-0002', created: '2025-03-29T12:05:00Z', lastOnline: new Date().toISOString(), role: 'Admin' }
         };
 
-        const userData = hardcodedUsers[username] || { created: 'Unknown', lastOnline: 'Unknown', role: 'User
+        let storedUsers = JSON.parse(localStorage.getItem('boltUsers')) || {};
+        const allUsers = { ...hardcodedUsers, ...storedUsers };
+        const userData = allUsers[username] || { created: 'Unknown', lastOnline: 'Unknown', role: 'User' };
+
+        document.getElementById('user-info').innerHTML = `
+            Logged in as: ${username} (${uid})<br>
+            Joined: ${new Date(userData.created).toLocaleString()}<br>
+            Last Online: ${new Date(userData.lastOnline).toLocaleString()}
+            <div>
+                <a href="profile.html?uid=${uid}&username=${encodeURIComponent(username)}" class="link">Profile</a>
+            </div>
+        `;
+
+        let messages = JSON.parse(localStorage.getItem('boltMessages')) || [
+            { id: 1, content: "This chat’s alive, bitches!", uid: "UID-0001", username: "Bolt!", created: "2025-03-29T12:00:00Z" },
+            { id: 2, content: "Hell yeah it is!", uid: "UID-0002", username: "listn", created: "2025-03-29T12:05:00Z" },
+            { id: 3, content: "Pineapple on pizza rules.", uid: "UID-0001", username: "Bolt!", created: "2025-03-29T12:15:00Z" }
+        ];
+
+        function renderMessages() {
+            const chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML = '';
+            messages.forEach(msg => {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'message';
+                msgDiv.innerHTML = `
+                    <p>${msg.content}</p>
+                    <div class="meta">Sent by ${msg.username} (${msg.uid}) on ${new Date(msg.created).toLocaleString()}</div>
+                `;
+                chatBox.appendChild(msgDiv);
+            });
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function sendMessage() {
+            const content = document.getElementById('chat-content').value.trim();
+            if (content) {
+                const newId = messages.length ? Math.max(...messages.map(m => m.id)) + 1 : 1;
+                messages.push({
+                    id: newId,
+                    content,
+                    uid,
+                    username,
+                    created: new Date().toISOString()
+                });
+                document.getElementById('chat-content').value = '';
+                localStorage.setItem('boltMessages', JSON.stringify(messages));
+                renderMessages();
+            }
+        }
+
+        renderMessages();
+    </script>
+</body>
+</html>
