@@ -91,7 +91,7 @@
             <input type="file" id="pfp-upload" accept="image/*" />
             <button onclick="saveBio()">Save Changes</button>
         </div>
-        <a href="#" id="back-link" class="back-link">Back to Chat</a>
+        <a href="#" id="back-link" class="back-link">Back to Profile</a>
     </div>
 
     <script>
@@ -117,7 +117,7 @@
         `;
         document.getElementById('pfp').src = bioData[uid].pfp;
         document.getElementById('display-name').value = bioData[uid].displayName;
-        document.getElementById('back-link').href = `chat.html?uid=${uid}&username=${encodeURIComponent(username)}`;
+        document.getElementById('back-link').href = `profile.html?uid=${uid}&username=${encodeURIComponent(username)}`;
 
         function saveBio() {
             const displayName = document.getElementById('display-name').value.trim() || bioData[uid].displayName;
