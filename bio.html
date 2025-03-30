@@ -100,11 +100,11 @@
         const username = urlParams.get('username') || 'Anonymous';
 
         const hardcodedUsers = {
-            'Bolt!': { uid: 'UID-0001', created: '2025-03-29T12:00:00Z', lastOnline: new Date().toISOString() },
-            'listn': { uid: 'UID-0002', created: '2025-03-29T12:05:00Z', lastOnline: new Date().toISOString() }
+            'Bolt!': { uid: 'UID-0001', created: '2025-03-29T12:00:00Z', lastOnline: new Date().toISOString(), role: 'Owner' },
+            'listn': { uid: 'UID-0002', created: '2025-03-29T12:05:00Z', lastOnline: new Date().toISOString(), role: 'Admin' }
         };
 
-        const userData = hardcodedUsers[username] || { created: 'Unknown', lastOnline: 'Unknown' };
+        const userData = hardcodedUsers[username] || { created: 'Unknown', lastOnline: 'Unknown', role: 'User' };
         let bioData = JSON.parse(localStorage.getItem('boltBioData')) || {
             'UID-0001': { displayName: 'Bolt!', pfp: 'https://via.placeholder.com/100' },
             'UID-0002': { displayName: 'listn', pfp: 'https://via.placeholder.com/100' }
