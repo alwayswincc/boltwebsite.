@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Bolt! - Chat</title>
+    <title>Bolt!</title>
     <style>
         body {
             margin: 0;
@@ -10,8 +10,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: #1C2526;
-            color: #7289DA;
+            background-color: #1C2526; /* Midnight-ish */
+            color: #7289DA; /* Blurple text */
             font-family: Arial, sans-serif;
         }
         h1 {
@@ -19,168 +19,162 @@
             font-weight: bold;
             margin-top: 20px;
             text-shadow: 
-                0 0 10px #FF0000,
-                0 0 20px #800080;
+                0 0 10px #FF0000, /* Red glow */
+                0 0 20px #800080; /* Purple glow */
         }
-        .chat-container {
+        .auth-container {
             margin-top: 50px;
-            background-color: #2A3439;
+            background-color: #2A3439; /* Darker panel */
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
-            width: 800px; /* Smaller width */
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5); /* Red-tinted shadow */
+            width: 300px;
         }
-        .user-info {
-            font-size: 18px;
-            color: #fff;
-            margin-bottom: 20px;
+        .tabs {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .link {
-            background-color: #7289DA;
-            padding: 5px 10px;
-            border-radius: 5px;
-            color: #fff;
-            text-decoration: none;
-            font-size: 14px;
-            margin-left: 10px;
-        }
-        .link:hover {
-            background-color: #FF0000;
-        }
-        .chat-box {
-            background-color: #1C2526;
-            padding: 20px;
+            justify-content: space-around;
             margin-bottom: 20px;
-            border-radius: 5px;
-            height: 400px; /* Smaller height */
-            overflow-y: auto;
-            border: 1px solid #7289DA;
         }
-        .message {
-            background-color: #2A3439;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(255, 0, 0, 0.3);
-        }
-        .message p {
-            margin: 0;
-            color: #fff;
-            font-size: 18px;
-            word-wrap: break-word;
-        }
-        .message .meta {
-            font-size: 14px;
+        .tab {
+            background-color: #1C2526;
+            padding: 10px;
+            width: 50%;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
             color: #7289DA;
-            margin-top: 8px;
+            font-weight: bold;
         }
-        .chat-form {
-            margin-top: 20px;
+        .tab.active {
+            background-color: #7289DA;
+            color: #fff;
         }
-        .chat-form textarea {
+        .form {
+            text-align: center;
+            display: none;
+        }
+        .form.active {
+            display: block;
+        }
+        .auth-container select, .auth-container input {
+            display: block;
             width: 100%;
-            height: 80px;
+            margin: 10px 0;
+            padding: 10px;
             background-color: #1C2526;
             border: 1px solid #7289DA;
             color: #fff;
             border-radius: 5px;
-            padding: 10px;
             font-size: 16px;
             box-sizing: border-box;
         }
-        .chat-form button {
+        .auth-container button {
             width: 100%;
-            padding: 12px;
-            background-color: #7289DA;
+            padding: 10px;
+            background-color: #7289DA; /* Blurple button */
             border: none;
             color: #fff;
             font-size: 16px;
             font-weight: bold;
             border-radius: 5px;
             cursor: pointer;
-            margin-top: 10px;
         }
-        .chat-form button:hover {
-            background-color: #FF0000;
+        .auth-container button:hover {
+            background-color: #FF0000; /* Red on hover */
         }
     </style>
 </head>
 <body>
     <h1>Bolt!</h1>
-    <div class="chat-container">
-        <div class="user-info" id="user-info"></div>
-        <div class="chat-box" id="chat-box"></div>
-        <div class="chat-form">
-            <textarea id="chat-content" placeholder="Type your fucking message..."></textarea>
-            <button onclick="sendMessage()">Send</button>
+    <div class="auth-container">
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('login')">Login</div>
+            <div class="tab" onclick="showTab('signup')">Signup</div>
+        </div>
+        <div id="login-form" class="form active">
+            <select id="username">
+                <option value="Bolt!">Bolt! (UID-0001)</option>
+                <option value="listn">listn (UID-0002)</option>
+            </select>
+            <input type="password" id="password" placeholder="Password" />
+            <button onclick="login()">Login</button>
+        </div>
+        <div id="signup-form" class="form">
+            <input type="text" id="signup-username" placeholder="Username" />
+            <input type="password" id="signup-password" placeholder="Password" />
+            <input type="text" id="invite-code" placeholder="Invitation Code" />
+            <button onclick="signup()">Signup</button>
         </div>
     </div>
 
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const uid = urlParams.get('uid') || 'UID-UNKNOWN';
-        const username = urlParams.get('username') || 'Anonymous';
-
         const hardcodedUsers = {
-            'Bolt!': { uid: 'UID-0001', created: '2025-03-29T12:00:00Z', lastOnline: new Date().toISOString(), role: 'Owner' },
-            'listn': { uid: 'UID-0002', created: '2025-03-29T12:05:00Z', lastOnline: new Date().toISOString(), role: 'Admin' }
+            'Bolt!': { uid: 'UID-0001', password: 'bolt!', role: 'Owner', created: '2025-03-29T12:00:00Z', lastOnline: new Date().toISOString() },
+            'listn': { uid: 'UID-0002', password: 'listnupdates', role: 'Admin', created: '2025-03-29T12:05:00Z', lastOnline: new Date().toISOString() }
         };
 
         let storedUsers = JSON.parse(localStorage.getItem('boltUsers')) || {};
-        const allUsers = { ...hardcodedUsers, ...storedUsers };
-        const userData = allUsers[username] || { created: 'Unknown', lastOnline: 'Unknown', role: 'User' };
 
-        document.getElementById('user-info').innerHTML = `
-            Logged in as: ${username} (${uid})<br>
-            Joined: ${new Date(userData.created).toLocaleString()}<br>
-            Last Online: ${new Date(userData.lastOnline).toLocaleString()}
-            <div>
-                <a href="profile.html?uid=${uid}&username=${encodeURIComponent(username)}" class="link">Profile</a>
-            </div>
-        `;
+        const lastUsername = localStorage.getItem('lastUsername') || 'Bolt!';
+        document.getElementById('username').value = lastUsername;
 
-        let messages = JSON.parse(localStorage.getItem('boltMessages')) || [
-            { id: 1, content: "This chat’s alive, bitches!", uid: "UID-0001", username: "Bolt!", created: "2025-03-29T12:00:00Z" },
-            { id: 2, content: "Hell yeah it is!", uid: "UID-0002", username: "listn", created: "2025-03-29T12:05:00Z" },
-            { id: 3, content: "Pineapple on pizza rules.", uid: "UID-0001", username: "Bolt!", created: "2025-03-29T12:15:00Z" }
-        ];
-
-        function renderMessages() {
-            const chatBox = document.getElementById('chat-box');
-            chatBox.innerHTML = '';
-            messages.forEach(msg => {
-                const msgDiv = document.createElement('div');
-                msgDiv.className = 'message';
-                msgDiv.innerHTML = `
-                    <p>${msg.content}</p>
-                    <div class="meta">Sent by ${msg.username} (${msg.uid}) on ${new Date(msg.created).toLocaleString()}</div>
-                `;
-                chatBox.appendChild(msgDiv);
-            });
-            chatBox.scrollTop = chatBox.scrollHeight;
+        function showTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.form').forEach(f => f.classList.remove('active'));
+            document.querySelector(`.tab[onclick="showTab('${tab}')"]`).classList.add('active');
+            document.getElementById(`${tab}-form`).classList.add('active');
         }
 
-        function sendMessage() {
-            const content = document.getElementById('chat-content').value.trim();
-            if (content) {
-                const newId = messages.length ? Math.max(...messages.map(m => m.id)) + 1 : 1;
-                messages.push({
-                    id: newId,
-                    content,
-                    uid,
-                    username,
-                    created: new Date().toISOString()
-                });
-                document.getElementById('chat-content').value = '';
-                localStorage.setItem('boltMessages', JSON.stringify(messages));
-                renderMessages();
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const user = hardcodedUsers[username] || storedUsers[username];
+
+            if (user && password === user.password) {
+                localStorage.setItem('lastUsername', username);
+                window.location.href = `chat.html?uid=${user.uid}&username=${encodeURIComponent(username)}`;
+            } else {
+                alert('Wrong fucking password or username, dipshit. Try again.');
             }
         }
 
-        renderMessages();
+        function signup() {
+            const username = document.getElementById('signup-username').value.trim();
+            const password = document.getElementById('signup-password').value.trim();
+            const inviteCode = document.getElementById('invite-code').value.trim();
+
+            if (!username || !password || !inviteCode) {
+                alert('Fill in all fucking fields, asshole.');
+                return;
+            }
+
+            if (inviteCode !== 'BOLT2025') {
+                alert('Invalid fucking invitation code, dipshit. Get the right one.');
+                return;
+            }
+
+            const allUsers = { ...hardcodedUsers, ...storedUsers };
+            if (Object.keys(allUsers).some(u => u.toLowerCase() === username.toLowerCase())) {
+                alert('That username’s taken, fuckwit. Pick another.');
+                return;
+            }
+
+            const uid = `UID-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+            storedUsers[username] = {
+                uid,
+                password,
+                role: 'User',
+                created: new Date().toISOString(),
+                lastOnline: new Date().toISOString()
+            };
+
+            localStorage.setItem('boltUsers', JSON.stringify(storedUsers));
+            localStorage.setItem('lastUsername', username);
+            alert('Signed up, you prick. Now log in.');
+            showTab('login');
+            document.getElementById('username').innerHTML += `<option value="${username}">${username} (${uid})</option>`;
+            document.getElementById('username').value = username;
+        }
     </script>
 </body>
 </html>
