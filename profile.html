@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bolt! - Profile</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #1C2526; /* Midnight-ish */
+            color: #7289DA; /* Blurple text */
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            font-size: 72px;
+            font-weight: bold;
+            margin-top: 20px;
+            text-shadow: 
+                0 0 10px #FF0000, /* Red glow */
+                0 0 20px #800080; /* Purple glow */
+        }
+        .profile-container {
+            margin-top: 50px;
+            background-color: #2A3439; /* Darker panel */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5); /* Red-tinted shadow */
+            width: 400px;
+        }
+        .profile-info {
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        .pfp {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            object-fit: cover;
+            border: 2px solid #7289DA;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #7289DA;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            color: #FF0000;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bolt!</h1>
+    <div class="profile-container">
+        <img id="pfp" class="pfp" src="" alt="Profile Picture" />
+        <div class="profile-info" id="profile-info"></div>
+        <a href="#" id="back-link" class="back-link">Back to Chat</a>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const uid = urlParams.get('uid') || 'UID-UNKNOWN';
+        const username = urlParams.get('username') || 'Anonymous';
+
+        const hardcodedUsers = {
+            'Bolt!': { uid: 'UID-0001', created: '2025-03-29T12:00:00Z', lastOnline: new Date().toISOString(), role: 'Owner' },
+            'listn': { uid: 'UID-0002', created: '2025-03-29T12:05:00Z', lastOnline: new Date().toISOString(), role: 'Admin' }
+        };
+
+        const userData = hardcodedUsers[username] || { created: 'Unknown', lastOnline: 'Unknown', role: 'User' };
+        let bioData = JSON.parse(localStorage.getItem('boltBioData')) || {
+            'UID-0001': { displayName: 'Bolt!', pfp: 'https://via.placeholder.com/100' },
+            'UID-0002': { displayName: 'listn', pfp: 'https://via.placeholder.com/100' }
+        };
+
+        document.getElementById('pfp').src = bioData[uid].pfp;
+        document.getElementById('profile-info').innerHTML = `
+            Username: ${username} (${uid})<br>
+            Display Name: ${bioData[uid].displayName}<br>
+            Joined: ${new Date(userData.created).toLocaleString()}<br>
+            Role: ${userData.role}
+        `;
+        document.getElementById('back-link').href = `chat.html?uid=${uid}&username=${encodeURIComponent(username)}`;
+    </script>
+</body>
+</html>
