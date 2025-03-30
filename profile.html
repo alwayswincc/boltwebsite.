@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -10,8 +10,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: #1C2526; /* Midnight-ish */
-            color: #7289DA; /* Blurple text */
+            background-color: #1C2526;
+            color: #7289DA;
             font-family: Arial, sans-serif;
         }
         h1 {
@@ -19,15 +19,15 @@
             font-weight: bold;
             margin-top: 20px;
             text-shadow: 
-                0 0 10px #FF0000, /* Red glow */
-                0 0 20px #800080; /* Purple glow */
+                0 0 10px #FF0000,
+                0 0 20px #800080;
         }
         .profile-container {
             margin-top: 50px;
-            background-color: #2A3439; /* Darker panel */
+            background-color: #2A3439;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5); /* Red-tinted shadow */
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
             width: 400px;
         }
         .profile-info {
@@ -43,15 +43,44 @@
             object-fit: cover;
             border: 2px solid #7289DA;
         }
-        .back-link {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            color: #7289DA;
-            text-decoration: none;
+        .links {
+            display: flex;
+            justify-content: space-between;
         }
-        .back-link:hover {
-            color: #FF0000;
+        .link {
+            background-color: #7289DA;
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+        .link:hover {
+            background-color: #FF0000;
+        }
+        .role-management {
+            margin-top: 20px;
+        }
+        .role-management select, .role-management button {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #1C2526;
+            border: 1px solid #7289DA;
+            color: #fff;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .role-management button {
+            background-color: #7289DA;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .role-management button:hover {
+            background-color: #FF0000;
         }
     </style>
 </head>
@@ -60,7 +89,20 @@
     <div class="profile-container">
         <img id="pfp" class="pfp" src="" alt="Profile Picture" />
         <div class="profile-info" id="profile-info"></div>
-        <a href="#" id="back-link" class="back-link">Back to Chat</a>
+        <div class="links">
+            <a href="#" id="bio-link" class="link">Edit Bio</a>
+            <a href="#" id="chat-link" class="link">Go to Chat</a>
+        </div>
+        <div id="role-management" class="role-management" style="display: none;">
+            <h3>Manage Roles</h3>
+            <select id="user-select"></select>
+            <select id="role-select">
+                <option value="User">User</option>
+                <option value="Admin">Admin</option>
+                <option value="Owner">Owner</option>
+            </select>
+            <button onclick="changeRole()">Change Role</button>
+        </div>
     </div>
 
     <script>
@@ -73,7 +115,10 @@
             'listn': { uid: 'UID-0002', created: '2025-03-29T12:05:00Z', lastOnline: new Date().toISOString(), role: 'Admin' }
         };
 
-        const userData = hardcodedUsers[username] || { created: 'Unknown', lastOnline: 'Unknown', role: 'User' };
+        let storedUsers = JSON.parse(localStorage.getItem('boltUsers')) || {};
+        const allUsers = { ...hardcodedUsers, ...storedUsers };
+        const userData = allUsers[username] || { created: 'Unknown', lastOnline: 'Unknown', role: 'User' };
+
         let bioData = JSON.parse(localStorage.getItem('boltBioData')) || {
             'UID-0001': { displayName: 'Bolt!', pfp: 'https://via.placeholder.com/100' },
             'UID-0002': { displayName: 'listn', pfp: 'https://via.placeholder.com/100' }
@@ -84,9 +129,42 @@
             Username: ${username} (${uid})<br>
             Display Name: ${bioData[uid].displayName}<br>
             Joined: ${new Date(userData.created).toLocaleString()}<br>
+            Last Online: ${new Date(userData.lastOnline).toLocaleString()}<br>
             Role: ${userData.role}
         `;
-        document.getElementById('back-link').href = `chat.html?uid=${uid}&username=${encodeURIComponent(username)}`;
+        document.getElementById('bio-link').href = `bio.html?uid=${uid}&username=${encodeURIComponent(username)}`;
+        document.getElementById('chat-link').href = `chat.html?uid=${uid}&username=${encodeURIComponent(username)}`;
+
+        if (uid === 'UID-0001') { // Only Bolt! (Owner) sees role management
+            document.getElementById('role-management').style.display = 'block';
+            const userSelect = document.getElementById('user-select');
+            Object.entries(allUsers).forEach(([name, data]) => {
+                const option = document.createElement('option');
+                option.value = name;
+                option.text = `${name} (${data.uid}) - ${data.role}`;
+                userSelect.appendChild(option);
+            });
+        }
+
+        function changeRole() {
+            const selectedUsername = document.getElementById('user-select').value;
+            const newRole = document.getElementById('role-select').value;
+
+            if (selectedUsername === 'Bolt!') {
+                alert('You can’t change your own fucking role, dipshit.');
+                return;
+            }
+
+            if (hardcodedUsers[selectedUsername]) {
+                hardcodedUsers[selectedUsername].role = newRole;
+            } else {
+                storedUsers[selectedUsername].role = newRole;
+                localStorage.setItem('boltUsers', JSON.stringify(storedUsers));
+            }
+
+            alert(`Changed ${selectedUsername}’s role to ${newRole}, you prick.`);
+            window.location.reload(); // Refresh to update displayed role
+        }
     </script>
 </body>
 </html>
