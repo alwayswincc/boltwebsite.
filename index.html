@@ -102,14 +102,15 @@
         <div id="signup-form" class="form">
             <input type="text" id="signup-username" placeholder="Username" />
             <input type="password" id="signup-password" placeholder="Password" />
+            <input type="text" id="invite-code" placeholder="Invitation Code" />
             <button onclick="signup()">Signup</button>
         </div>
     </div>
 
     <script>
         const hardcodedUsers = {
-            'Bolt!': { uid: 'UID-0001', password: 'bolt!', role: 'Owner' },
-            'listn': { uid: 'UID-0002', password: 'listnupdates', role: 'Admin' }
+            'Bolt!': { uid: 'UID-0001', password: 'bolt!', role: 'Owner', created: '2025-03-29T12:00:00Z', lastOnline: new Date().toISOString() },
+            'listn': { uid: 'UID-0002', password: 'listnupdates', role: 'Admin', created: '2025-03-29T12:05:00Z', lastOnline: new Date().toISOString() }
         };
 
         let storedUsers = JSON.parse(localStorage.getItem('boltUsers')) || {};
@@ -140,9 +141,15 @@
         function signup() {
             const username = document.getElementById('signup-username').value.trim();
             const password = document.getElementById('signup-password').value.trim();
+            const inviteCode = document.getElementById('invite-code').value.trim();
 
-            if (!username || !password) {
-                alert('Fill in both fucking fields, asshole.');
+            if (!username || !password || !inviteCode) {
+                alert('Fill in all fucking fields, asshole.');
+                return;
+            }
+
+            if (inviteCode !== 'BOLT2025') {
+                alert('Invalid fucking invitation code, dipshit. Get the right one.');
                 return;
             }
 
@@ -152,7 +159,7 @@
                 return;
             }
 
-            const uid = `UID-${Math.random().toString(36).substr(2, 9).toUpperCase()}`; // Random UID
+            const uid = `UID-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
             storedUsers[username] = {
                 uid,
                 password,
