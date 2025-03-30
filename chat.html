@@ -34,6 +34,20 @@
             font-size: 18px;
             color: #fff;
             margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .bio-link {
+            background-color: #7289DA;
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .bio-link:hover {
+            background-color: #FF0000;
         }
         .chat-box {
             background-color: #1C2526;
@@ -116,6 +130,7 @@
             Logged in as: ${username} (${uid})<br>
             Joined: ${new Date(userData.created).toLocaleString()}<br>
             Last Online: ${new Date(userData.lastOnline).toLocaleString()}
+            <a href="bio.html?uid=${uid}&username=${encodeURIComponent(username)}" class="bio-link">Edit Bio</a>
         `;
 
         let messages = JSON.parse(localStorage.getItem('boltMessages')) || [
@@ -136,7 +151,7 @@
                 `;
                 chatBox.appendChild(msgDiv);
             });
-            chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to bottom
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
         function sendMessage() {
