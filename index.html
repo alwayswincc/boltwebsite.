@@ -30,32 +30,10 @@
             box-shadow: 0 0 15px rgba(255, 0, 0, 0.5); /* Red-tinted shadow */
             width: 300px;
         }
-        .tabs {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-        }
-        .tab {
-            width: 50%;
-            text-align: center;
-            padding: 10px;
-            background-color: #1C2526;
-            color: #7289DA;
-            cursor: pointer;
-            border-radius: 5px 5px 0 0;
-        }
-        .tab.active {
-            background-color: #7289DA;
-            color: #fff;
-        }
         .form {
-            display: none;
             text-align: center;
         }
-        .form.active {
-            display: block;
-        }
-        .auth-container input {
+        .auth-container select, .auth-container input {
             display: block;
             width: 100%;
             margin: 10px 0;
@@ -86,92 +64,37 @@
 <body>
     <h1>Bolt!</h1>
     <div class="auth-container">
-        <div class="tabs">
-            <div class="tab active" onclick="showForm('login')">Login</div>
-            <div class="tab" onclick="showForm('signup')">Sign Up</div>
-        </div>
-        <div id="login" class="form active">
-            <input type="text" id="login-username" placeholder="Username" />
-            <input type="password" id="login-password" placeholder="Password" />
+        <div class="form">
+            <select id="username">
+                <option value="Bolt!">Bolt! (UID-0001)</option>
+                <option value="listn">listn (UID-0002)</option>
+            </select>
+            <input type="password" id="password" placeholder="Password" />
             <button onclick="login()">Login</button>
-        </div>
-        <div id="signup" class="form">
-            <input type="text" id="signup-username" placeholder="Username" />
-            <input type="password" id="signup-password" placeholder="Password" />
-            <button onclick="signup()">Sign Up</button>
         </div>
     </div>
 
     <script>
-        function getUsers() {
-            return JSON.parse(localStorage.getItem('boltUsers')) || {
-                'Bolt!': { uid: 'UID-0001', password: 'bolt!', created: '2025-03-29T12:00:00Z', lastOnline: '2025-03-29T12:00:00Z' },
-                'listn': { uid: 'UID-0002', password: 'listnupdates', created: '2025-03-29T12:05:00Z', lastOnline: '2025-03-29T12:05:00Z' }
-            };
-        }
-
-        function saveUsers(users) {
-            localStorage.setItem('boltUsers', JSON.stringify(users));
-        }
-
-        function generateUID(userCount) {
-            return `UID-${String(userCount + 1).padStart(4, '0')}`;
-        }
+        const users = {
+            'Bolt!': { uid: 'UID-0001', password: 'bolt!' },
+            'listn': { uid: 'UID-0002', password: 'listnupdates' }
+        };
 
         // Load last logged-in account
         const lastUsername = localStorage.getItem('lastUsername') || 'Bolt!';
-        document.getElementById('login-username').value = lastUsername;
-
-        function showForm(formId) {
-            document.querySelectorAll('.form').forEach(form => form.classList.remove('active'));
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            document.getElementById(formId).classList.add('active');
-            document.querySelector(`.tab[onclick="showForm('${formId}')"]`).classList.add('active');
-        }
+        document.getElementById('username').value = lastUsername;
 
         function login() {
-            const username = document.getElementById('login-username').value.trim();
-            const password = document.getElementById('login-password').value;
-            const users = getUsers();
-
-            if (!username || !password) {
-                alert('Fill in all the fucking fields, asshole.');
-                return;
-            }
-
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
             const user = users[username];
-            if (user && user.password === password) {
-                users[username].lastOnline = new Date().toISOString();
-                saveUsers(users);
-                localStorage.setItem('lastUsername', username);
-                window.location.href = `forums.html?uid=${user.uid}&username=${encodeURIComponent(username)}`;
+
+            if (password === user.password) {
+                localStorage.setItem('lastUsername', username); // Remember this account
+                window.location.href = `chat.html?uid=${user.uid}&username=${encodeURIComponent(username)}`;
             } else {
-                alert('Wrong fucking username or password, dipshit.');
+                alert('Wrong fucking password, dipshit. Try again.');
             }
-        }
-
-        function signup() {
-            const username = document.getElementById('signup-username').value.trim();
-            const password = document.getElementById('signup-password').value;
-            const users = getUsers();
-
-            if (!username || !password) {
-                alert('Fill in all the fucking fields, asshole.');
-                return;
-            }
-
-            if (users[username]) {
-                alert('Username’s taken, prick. Pick another.');
-                return;
-            }
-
-            const userCount = Object.keys(users).length;
-            const uid = generateUID(userCount);
-            const now = new Date().toISOString();
-            users[username] = { uid, password, created: now, lastOnline: now };
-            saveUsers(users);
-            localStorage.setItem('lastUsername', username);
-            window.location.href = `forums.html?uid=${uid}&username=${encodeURIComponent(username)}`;
         }
     </script>
 </body>
