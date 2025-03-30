@@ -13,6 +13,47 @@
             background-color: #1C2526; /* Midnight-ish */
             color: #7289DA; /* Blurple text */
             font-family: Arial, sans-serif;
+            overflow: hidden; /* Prevent scroll during loading */
+        }
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #1C2526;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+        }
+        #loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        #loading-text {
+            font-size: 60px;
+            font-weight: bold;
+            text-shadow: 
+                0 0 10px #FF0000, /* Red glow */
+                0 0 20px #800080; /* Purple glow */
+            margin-bottom: 20px;
+        }
+        .bullet {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 5px #FF0000;
+            animation: shoot 1s linear infinite;
+        }
+        @keyframes shoot {
+            0% { left: -20px; }
+            100% { left: 100%; }
         }
         h1 {
             font-size: 72px;
@@ -29,6 +70,11 @@
             border-radius: 10px;
             box-shadow: 0 0 15px rgba(255, 0, 0, 0.5); /* Red-tinted shadow */
             width: 300px;
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
+        }
+        .auth-container.visible {
+            opacity: 1;
         }
         .tabs {
             display: flex;
@@ -85,6 +131,9 @@
     </style>
 </head>
 <body>
+    <div id="loading-screen">
+        <div id="loading-text">BOLT! BEST CRACKING TEAM</div>
+    </div>
     <h1>Bolt!</h1>
     <div class="auth-container">
         <div class="tabs">
@@ -117,6 +166,26 @@
 
         const lastUsername = localStorage.getItem('lastUsername') || 'Bolt!';
         document.getElementById('username').value = lastUsername;
+
+        // Loading screen logic
+        function createBullet() {
+            const bullet = document.createElement('div');
+            bullet.className = 'bullet';
+            bullet.style.top = `${Math.random() * (window.innerHeight - 20)}px`; // Random vertical position
+            document.getElementById('loading-screen').appendChild(bullet);
+            setTimeout(() => bullet.remove(), 1000); // Remove after animation
+        }
+
+        // Spawn bullets every 100ms
+        const bulletInterval = setInterval(createBullet, 100);
+
+        // Hide loading screen after 3 seconds
+        setTimeout(() => {
+            clearInterval(bulletInterval);
+            document.getElementById('loading-screen').classList.add('hidden');
+            document.querySelector('.auth-container').classList.add('visible');
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        }, 3000);
 
         function showTab(tab) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
