@@ -28,55 +28,29 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 15px rgba(255, 0, 0, 0.5); /* Red-tinted shadow */
-            width: 500px;
+            width: 400px;
         }
-        .bio-info {
+        .user-info {
             font-size: 18px;
             color: #fff;
             margin-bottom: 20px;
-            display: flex;
-            align-items: center;
         }
-        .bio-info img {
-            width: 50px;
-            height: 50px;
+        .pfp {
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            margin-right: 15px;
+            margin-bottom: 20px;
+            object-fit: cover;
             border: 2px solid #7289DA;
-            cursor: pointer;
         }
-        .bio-info img:hover {
-            border-color: #FF0000;
-        }
-        .bio-info a {
-            color: #7289DA;
-            text-decoration: none;
-        }
-        .bio-info a:hover {
-            color: #FF0000;
-        }
-        .bio-form {
-            margin-top: 10px;
-        }
-        .bio-form input[type="text"] {
+        .bio-form input, .bio-form textarea {
             width: 100%;
-            background-color: #1C2526;
-            border: 1px solid #7289DA;
-            color: #fff;
-            border-radius: 5px;
-            padding: 8px;
-            font-size: 16px;
-            box-sizing: border-box;
-            margin-bottom: 10px;
-        }
-        .bio-form textarea {
-            width: 100%;
-            height: 150px;
-            background-color: #1C2526;
-            border: 1px solid #7289DA;
-            color: #fff;
-            border-radius: 5px;
+            margin: 10px 0;
             padding: 10px;
+            background-color: #1C2526;
+            border: 1px solid #7289DA;
+            color: #fff;
+            border-radius: 5px;
             font-size: 16px;
             box-sizing: border-box;
         }
@@ -95,20 +69,29 @@
         .bio-form button:hover {
             background-color: #FF0000;
         }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #7289DA;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            color: #FF0000;
+        }
     </style>
 </head>
 <body>
     <h1>Bolt!</h1>
     <div class="bio-container">
-        <div class="bio-info" id="bio-info">
-            <img src="" id="profile-pfp" onclick="document.getElementById('pfp-upload').click()" alt="Profile Picture">
-            <input type="file" id="pfp-upload" accept="image/*" style="display: none;" onchange="updatePFP(event)">
-        </div>
+        <div class="user-info" id="user-info"></div>
+        <img id="pfp" class="pfp" src="" alt="Profile Picture" />
         <div class="bio-form">
-            <input type="text" id="display-name-input" placeholder="Set display name">
-            <textarea id="bio-content" placeholder="Write your fucking bio..."></textarea>
-            <button onclick="saveProfile()">Save Profile</button>
+            <input type="text" id="display-name" placeholder="Display Name" />
+            <input type="file" id="pfp-upload" accept="image/*" />
+            <button onclick="saveBio()">Save Changes</button>
         </div>
+        <a href="#" id="back-link" class="back-link">Back to Chat</a>
     </div>
 
     <script>
@@ -116,51 +99,46 @@
         const uid = urlParams.get('uid') || 'UID-UNKNOWN';
         const username = urlParams.get('username') || 'Anonymous';
 
-        const users = JSON.parse(localStorage.getItem('boltUsers')) || {
-            'Bolt!': { uid: 'UID-0001', password: 'bolt!', created: '2025-03-29T12:00:00Z', lastOnline: '2025-03-29T12:00:00Z', bio: 'King of this shitshow.', pfp: '', displayName: 'BoltMaster' },
-            'listn': { uid: 'UID-0002', password: 'listnupdates', created: '2025-03-29T12:05:00Z', lastOnline: '2025-03-29T12:05:00Z', bio: 'Just here to fuck around.', pfp: '', displayName: 'ListnUp' }
+        const hardcodedUsers = {
+            'Bolt!': { uid: 'UID-0001', created: '2025-03-29T12:00:00Z', lastOnline: new Date().toISOString() },
+            'listn': { uid: 'UID-0002', created: '2025-03-29T12:05:00Z', lastOnline: new Date().toISOString() }
         };
-        const userData = users[username] || { created: 'Unknown', lastOnline: 'Unknown', bio: '', pfp: '', displayName: username };
 
-        const defaultPFP = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADJSURBVFhH7Za9DYBACES7/QX3bsEH2NjY2NjY2NjY2NgYxsbGxsYQEf+EBUFEtVrVqlUAgL6+PhqN5vP5TqdTqVSCIAjW6/XpdDqVSqVSCYIgWKlUis/n8/l8Pp1OpVIJgiBYqVSKzWaz2Ww2m82mUqkEgSBYqVSK3W63W+12u91ut9vtVCoBIJDP5/P5fD6fTqfT6XQ6nUqlEgSCYL1eD4IgWKlUIAgC2Ww2m82mUqlUgiAI1uv1er1er9fr9Xq9Xq/X6/U6nUqlUgmCIAjW6/V6vV6v1+t1Op1KpRIEmwE2nH4aK4fSAAAAAElFTkSuQmCC';
+        const userData = hardcodedUsers[username] || { created: 'Unknown', lastOnline: 'Unknown' };
+        let bioData = JSON.parse(localStorage.getItem('boltBioData')) || {
+            'UID-0001': { displayName: 'Bolt!', pfp: 'https://via.placeholder.com/100' },
+            'UID-0002': { displayName: 'listn', pfp: 'https://via.placeholder.com/100' }
+        };
 
-        function renderBio() {
-            document.getElementById('bio-info').innerHTML = `
-                <img src="${userData.pfp || defaultPFP}" id="profile-pfp" onclick="document.getElementById('pfp-upload').click()" alt="Profile Picture">
-                <input type="file" id="pfp-upload" accept="image/*" style="display: none;" onchange="updatePFP(event)">
-                Username: ${username} (${uid}) [<a href="forums.html?uid=${uid}&username=${encodeURIComponent(username)}">Back to Forum</a>]<br>
-                Joined: ${new Date(userData.created).toLocaleString()}<br>
-                Last Online: ${new Date(userData.lastOnline).toLocaleString()}<br>
-                Bio: ${userData.bio || 'No fucking bio yet.'}
-            `;
-            document.getElementById('display-name-input').value = userData.displayName || '';
-            document.getElementById('bio-content').value = userData.bio || '';
-        }
+        document.getElementById('user-info').innerHTML = `
+            Username: ${username} (${uid})<br>
+            Joined: ${new Date(userData.created).toLocaleString()}<br>
+            Last Online: ${new Date(userData.lastOnline).toLocaleString()}
+        `;
+        document.getElementById('pfp').src = bioData[uid].pfp;
+        document.getElementById('display-name').value = bioData[uid].displayName;
+        document.getElementById('back-link').href = `chat.html?uid=${uid}&username=${encodeURIComponent(username)}`;
 
-        function updatePFP(event) {
-            const file = event.target.files[0];
+        function saveBio() {
+            const displayName = document.getElementById('display-name').value.trim() || bioData[uid].displayName;
+            const fileInput = document.getElementById('pfp-upload');
+            const file = fileInput.files[0];
+
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const pfpData = e.target.result;
-                    users[username].pfp = pfpData;
-                    localStorage.setItem('boltUsers', JSON.stringify(users));
-                    document.getElementById('profile-pfp').src = pfpData;
+                    bioData[uid] = { displayName, pfp: e.target.result };
+                    localStorage.setItem('boltBioData', JSON.stringify(bioData));
+                    document.getElementById('pfp').src = e.target.result;
+                    alert('Bio fucking updated, prick.');
                 };
                 reader.readAsDataURL(file);
+            } else {
+                bioData[uid] = { displayName, pfp: bioData[uid].pfp };
+                localStorage.setItem('boltBioData', JSON.stringify(bioData));
+                alert('Bio fucking updated, prick.');
             }
         }
-
-        function saveProfile() {
-            const bio = document.getElementById('bio-content').value.trim();
-            const displayName = document.getElementById('display-name-input').value.trim();
-            users[username].bio = bio;
-            if (displayName) users[username].displayName = displayName;
-            localStorage.setItem('boltUsers', JSON.stringify(users));
-            renderBio();
-        }
-
-        renderBio();
     </script>
 </body>
 </html>
