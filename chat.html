@@ -38,15 +38,16 @@
             justify-content: space-between;
             align-items: center;
         }
-        .bio-link {
+        .link {
             background-color: #7289DA;
             padding: 5px 10px;
             border-radius: 5px;
             color: #fff;
             text-decoration: none;
             font-size: 14px;
+            margin-left: 10px;
         }
-        .bio-link:hover {
+        .link:hover {
             background-color: #FF0000;
         }
         .chat-box {
@@ -121,57 +122,8 @@
         const username = urlParams.get('username') || 'Anonymous';
 
         const hardcodedUsers = {
-            'Bolt!': { uid: 'UID-0001', created: '2025-03-29T12:00:00Z', lastOnline: new Date().toISOString() },
-            'listn': { uid: 'UID-0002', created: '2025-03-29T12:05:00Z', lastOnline: new Date().toISOString() }
+            'Bolt!': { uid: 'UID-0001', created: '2025-03-29T12:00:00Z', lastOnline: new Date().toISOString(), role: 'Owner' },
+            'listn': { uid: 'UID-0002', created: '2025-03-29T12:05:00Z', lastOnline: new Date().toISOString(), role: 'Admin' }
         };
 
-        const userData = hardcodedUsers[username] || { created: 'Unknown', lastOnline: 'Unknown' };
-        document.getElementById('user-info').innerHTML = `
-            Logged in as: ${username} (${uid})<br>
-            Joined: ${new Date(userData.created).toLocaleString()}<br>
-            Last Online: ${new Date(userData.lastOnline).toLocaleString()}
-            <a href="bio.html?uid=${uid}&username=${encodeURIComponent(username)}" class="bio-link">Edit Bio</a>
-        `;
-
-        let messages = JSON.parse(localStorage.getItem('boltMessages')) || [
-            { id: 1, content: "This chat’s alive, bitches!", uid: "UID-0001", username: "Bolt!", created: "2025-03-29T12:00:00Z" },
-            { id: 2, content: "Hell yeah it is!", uid: "UID-0002", username: "listn", created: "2025-03-29T12:05:00Z" },
-            { id: 3, content: "Pineapple on pizza rules.", uid: "UID-0001", username: "Bolt!", created: "2025-03-29T12:15:00Z" }
-        ];
-
-        function renderMessages() {
-            const chatBox = document.getElementById('chat-box');
-            chatBox.innerHTML = '';
-            messages.forEach(msg => {
-                const msgDiv = document.createElement('div');
-                msgDiv.className = 'message';
-                msgDiv.innerHTML = `
-                    <p>${msg.content}</p>
-                    <div class="meta">Sent by ${msg.username} (${msg.uid}) on ${new Date(msg.created).toLocaleString()}</div>
-                `;
-                chatBox.appendChild(msgDiv);
-            });
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        function sendMessage() {
-            const content = document.getElementById('chat-content').value.trim();
-            if (content) {
-                const newId = messages.length ? Math.max(...messages.map(m => m.id)) + 1 : 1;
-                messages.push({
-                    id: newId,
-                    content,
-                    uid,
-                    username,
-                    created: new Date().toISOString()
-                });
-                document.getElementById('chat-content').value = '';
-                localStorage.setItem('boltMessages', JSON.stringify(messages));
-                renderMessages();
-            }
-        }
-
-        renderMessages();
-    </script>
-</body>
-</html>
+        const userData = hardcodedUsers[username] || { created: 'Unknown', lastOnline: 'Unknown', role: 'User
